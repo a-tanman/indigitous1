@@ -7,6 +7,12 @@ var builder = require('botbuilder');
 var request = require('request');
 //const bot = require('./bot.js');
 
+var resource_id = '1338652566261532';
+var troubled_id = '1702892436422920';
+var reroute_resource = false;
+var reroute_troubled = false;
+
+
 // Setup Restify Server
 var server = restify.createServer();
 server.listen(process.env.port || process.env.PORT || 3978, function () {
@@ -101,28 +107,33 @@ bot.dialog('/sad',[
         function(session, results){
             let options = {
                 listStyle: builder.ListStyle['button']
-            };
-            builder.Prompts.choice(session, 'That\s a big decision. Do you want to meet and talk about it over drinks? I\'m at 33 Smith Street.', ['Yes','No'], options);
+            }
+            builder.Prompts.text(session,'That\'s a big decision. Do you want to meet and talk about it over drinks? I\'m at 33 Smith Street.');
+            //builder.Prompts.choice(session, 'That\s a big decision. Do you want to meet and talk about it over drinks? I\'m at 33 Smith Street.', ['Yes','No'], options);
         },
+//        function(session, results){
+//                if(results.response){
+//                    switch (results.response.index){
+//                        case 0:
+//                            //session.send('How long will you take to get there?');
+//                            builder.Prompts.text(session, 'How long will you take to get there?');
+//                            break;
+//                        case 1:
+//                                //builder.Prompts.text(session, ':(');
+//                                session.send('Ouch, that is going to be painful!');
+//                                session.send('There is no real best way to die and they all involve a lot of pain.');
+//                                session.send('Hang on, let me think about it...');
+//                                session.beginDialog('route');
+//                            break;
+//                    }
+//                }
+//        },
         function(session, results){
                 if(results.response){
-                    switch (results.response.index){
-                        case 0:
-                            //session.send('How long will you take to get there?');
-                            builder.Prompts.text(session, 'How long will you take to get there?');
-                            break;
-                        case 1:
-                                //builder.Prompts.text(session, ':(');
-                                session.send('Ouch, that is going to be painful!');
-                                session.send('There is no real best way to die and they all involve a lot of pain.');
-                                session.send('Hang on, let me think about it...');
-                                session.beginDialog('route');
-                            break;
-                    }
-                }
-        },
-        function(session, results){
-                if(results.response){
+                    session.send(':\'( Ouch, that is going to be painful!');
+                    session.send('There is no real best way to kill yourself without involving a lot of pain.');
+                   session.send('Hang on, let me think about it...'); 
+                    session.beginDialog('route');
                     console.log(results.response);
                 }
         }
@@ -132,17 +143,68 @@ bot.dialog('/sad',[
 bot.dialog('route', [
         function(session){
 console.log('Test reroute');
+reroute_troubled = true;
     request({
   uri: "https://graph.facebook.com/v2.6/me/messages?access_token=EAACWwd1mk3gBANPeqrVtCbynXs7rIIUVIKsY8OZCnnWEZBueGOsgt5kZBdjOHdJtFfF5Dot8RL628jmOeGikW8OEZCWPp8d1ZAWp3P7IRSFZAN0G0VKsXAh7Vv33OYYRWm3WKLYjkd1RupHxXuk4aZAsZA6L9MdFCjfrosSzIlCcngZDZD",
   method: "POST",
   json: {
-      recipient: { "id" : "1324741717653119"},
-      message: { "text" : "Help! We have someone who urgently needs to talk to you."}
+      recipient: { "id" : resource_id },
+      message: { "text" : "Help! We have someone who urgently needs to talk to you. Suicidal risk is: High. Type 'GO' to be connected now..."}
   }
 })
-    }]).triggerAction({ matches:/^(reroute)/i});
+    session.beginDialog('needhelp');
+    }    ]).triggerAction({ matches:/^(reroute)/i});
+
+bot.dialog('needhelp',[
+        function(session){
+                builder.Prompts.text(session, '>');
+        },
+        function(session, results){
+                
+            if(results.response){
+               request({
+  uri: "https://graph.facebook.com/v2.6/me/messages?access_token=EAACWwd1mk3gBANPeqrVtCbynXs7rIIUVIKsY8OZCnnWEZBueGOsgt5kZBdjOHdJtFfF5Dot8RL628jmOeGikW8OEZCWPp8d1ZAWp3P7IRSFZAN0G0VKsXAh7Vv33OYYRWm3WKLYjkd1RupHxXuk4aZAsZA6L9MdFCjfrosSzIlCcngZDZD",
+  method: "POST",
+  json: {
+      recipient: { "id" : resource_id },
+      message: { "text" : results.response}
+  }
+            })
+        first_go = false;
+        session.beginDialog('needhelp');
+        }
+
+            //console.log('empty prompts test');
+        }]);
+
 
 bot.use(builder.Middleware.sendTyping());
+
+var first_go = true;
+bot.dialog('go',[
+        function(session){
+            if(first_go){
+                builder.Prompts.text(session,'Your conversation is starting now...');
+            } else {
+                builder.Prompts.text(session, '>');
+            }
+        },
+        function(session, results){
+            console.log(results.response);
+            if(results.response){
+               request({
+  uri: "https://graph.facebook.com/v2.6/me/messages?access_token=EAACWwd1mk3gBANPeqrVtCbynXs7rIIUVIKsY8OZCnnWEZBueGOsgt5kZBdjOHdJtFfF5Dot8RL628jmOeGikW8OEZCWPp8d1ZAWp3P7IRSFZAN0G0VKsXAh7Vv33OYYRWm3WKLYjkd1RupHxXuk4aZAsZA6L9MdFCjfrosSzIlCcngZDZD",
+  method: "POST",
+  json: {
+      recipient: { "id" : troubled_id },
+      message: { "text" : results.response}
+  }
+            })
+        first_go = false;
+        session.beginDialog('go');
+        }
+    }
+]).triggerAction({ matches:/^(go)/i});
 
 const logUserConversation = (event) => {
     //console.log('test log ' + event.text);
