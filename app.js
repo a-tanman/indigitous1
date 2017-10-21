@@ -4,6 +4,7 @@ A simple echo bot for the Microsoft Bot Framework.
 
 var restify = require('restify');
 var builder = require('botbuilder');
+//const bot = require('./bot.js');
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -39,14 +40,22 @@ var luisAPIHostName = process.env.LuisAPIHostName || 'westus.api.cognitive.micro
 const LuisModelUrl = 'https://' + luisAPIHostName + '/luis/v1/application?id=' + luisAppId + '&subscription-key=' + luisAPIKey;
 
 // Main dialog with LUIS
-var recognizer = new builder.LuisRecognizer(LuisModelUrl);
-var intents = new builder.IntentDialog({ recognizers: [recognizer] })
+// Removing LUIS
+// var recognizer = new builder.LuisRecognizer(LuisModelUrl);
+// var intents = new builder.IntentDialog({ recognizers: [recognizer] })
 /*
 .matches('<yourIntent>')... See details at http://docs.botframework.com/builder/node/guides/understanding-natural-language/
 */
-.onDefault((session) => {
-    session.send('Sorry, I did not understand \'%s\'.', session.message.text);
-});
+//.onDefault((session) => {
+//    session.send('Sorry, I did not understand \'%s\'.', session.message.text);
+//});
 
-bot.dialog('/', intents);    
+var intents = new builder.IntentDialog();
+bot.dialog('/', intents); 
+intents.onDefault('/start');
 
+bot.dialog('/start', function(session){
+    session.send('Hello there!');
+}).triggerAction({ matches:/^(Get\sStarted)/i });
+
+bot.use(builder.Middleware.sendTyping());
