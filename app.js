@@ -59,3 +59,39 @@ bot.dialog('/start', function(session){
 }).triggerAction({ matches:/^(Get\sStarted)/i });
 
 bot.use(builder.Middleware.sendTyping());
+
+const logUserConversation = (event) => {
+    //console.log('test log ' + event.text);
+    if(isEmpty(event.text)){
+    console.log('\ntimestamp: ' + getDateTime() + '; message: ' + event.text + '; user: ' + event.address.user.name + '; id: ' + event.address.user.id);
+    fs.appendFile('log.txt', '\ntimestamp: ' + getDateTime() + '; message: ' + event.text + '; user: ' + event.address.user.name, function(err) {
+        if (err) {
+            // append failed
+            console.log('append failed')
+        } else {
+            // done
+        }
+    });
+}
+    //console.log('message: ' + event.text + ', user: ' + event.address.user.name);
+};
+
+// Middleware for logging
+bot.use({
+    receive: function(event, next) {
+        logUserConversation(event);
+        next();
+    },
+    send: function(event, next) {
+        logUserConversation(event);
+        next();
+    }
+});
+
+function getDateTime() {
+    var utc = new Date().toJSON();
+    return(utc);
+}
+
+function isEmpty(object) { for(var i in object) { return true; } return false; }
+
