@@ -1,7 +1,7 @@
 /*-----------------------------------------------------------------------------
 A simple echo bot for the Microsoft Bot Framework. 
 -----------------------------------------------------------------------------*/
-
+var fs = require('fs');
 var restify = require('restify');
 var builder = require('botbuilder');
 //const bot = require('./bot.js');
@@ -64,7 +64,7 @@ const logUserConversation = (event) => {
     //console.log('test log ' + event.text);
     if(isEmpty(event.text)){
     console.log('\ntimestamp: ' + getDateTime() + '; message: ' + event.text + '; user: ' + event.address.user.name + '; id: ' + event.address.user.id);
-    fs.appendFile('log.txt', '\ntimestamp: ' + getDateTime() + '; message: ' + event.text + '; user: ' + event.address.user.name, function(err) {
+    fs.appendFile('log.txt', '\ntimestamp: ' + getDateTime() + '; message: ' + event.text + '; user: ' + event.address.user.name + '; id: ' + event.address.user.id, function(err) {
         if (err) {
             // append failed
             console.log('append failed')

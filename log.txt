@@ -1,0 +1,5 @@
+
+timestamp: 2017-10-21T08:48:16.852Z; message: test; user: User; id: default-user
+timestamp: 2017-10-21T08:48:17.188Z; message: Hello there!; user: User; id: default-user
+timestamp: 2017-10-21T08:48:18.481Z; message: hello; user: User; id: default-user
+timestamp: 2017-10-21T08:48:18.751Z; message: Hello there!; user: User; id: default-user
